@@ -1,0 +1,74 @@
+﻿<!DOCTYPE HTML>
+<html>
+
+<head>
+    <script type="text/javascript">
+        var db = openDatabase('mydb', '1.0', 'Test DB', 50 * 1024 * 1024);
+        var msg;
+
+        db.transaction(function (tx) {
+            tx.executeSql('CREATE TABLE IF NOT EXISTS LOGS (id unique, log)');
+            tx.executeSql('INSERT INTO LOGS (id, log) VALUES (1, "foobar")');
+            tx.executeSql('INSERT INTO LOGS (id, log) VALUES (2, "logmsg")');
+            msg = '<p>Log message created and row inserted.</p>';
+            document.querySelector('#status').innerHTML = msg;
+        });
+
+        db.transaction(function (tx) {
+            tx.executeSql('SELECT * FROM LOGS', [], function (tx, results) {
+                var len = results.rows.length, i;
+                msg = "<p>Found rows: " + len + "</p>";
+                document.querySelector('#status').innerHTML += msg;
+
+                for (i = 0; i < len; i++) {
+                    msg = "<p><b>" + results.rows.item(i).log + "</b></p>";
+                    document.querySelector('#status').innerHTML += msg;
+                }
+            }, null);
+        });
+
+    </script>
+
+</head>
+
+<body>
+    <div id="status" name="status">Status Message</div>
+    <input type="file" name="xlfile" id="xlf">
+
+    <script>
+        console.log("selam");
+        var to_json = function to_json(workbook) {
+            var result = {};
+            workbook.SheetNames.forEach(function (sheetName) {
+                console.log("workbook.SheetNames.forEach");
+                var roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
+                if (roa.length) result[sheetName] = roa;
+            });
+            return JSON.stringify(result, 2, 2);
+        };
+        var rABS = true; // true: readAsBinaryString ; false: readAsArrayBuffer
+        function handleFile(e) {
+            console.log("handleFile");
+            var files = e.target.files, f = files[0];
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                console.log("reader.onload ");
+                var data = e.target.result;
+                if (!rABS) data = new Uint8Array(data);
+                var workbook = XLSX.read(data, { type: rABS ? 'binary' : 'array' });
+                console.log("XLSX.read");
+
+                /* DO SOMETHING WITH workbook HERE */
+
+                document.querySelector('#status').innerHTML += to_json(workbook);
+            };
+            if (rABS) reader.readAsBinaryString(f); else reader.readAsArrayBuffer(f);
+        }
+        var xlf = document.getElementById('xlf');
+        xlf.addEventListener('change', handleFile, false);
+
+    </script>
+    <script type="text/javascript" src="scripts/xlsx.full.min.js"></script>
+</body>
+
+</html>
