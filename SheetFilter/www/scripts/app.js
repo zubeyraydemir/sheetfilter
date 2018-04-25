@@ -1,30 +1,45 @@
-﻿// For an introduction to the Blank template, see the following documentation:
-// http://go.microsoft.com/fwlink/?LinkID=397704
-// To debug code on page load in cordova-simulate or on Android devices/emulators: launch your app, set breakpoints, 
-// and then run "window.location.reload()" in the JavaScript Console.
-(function () {
-    "use strict";
+﻿var app = {
+    templateColumn: "",
+    columns: null,
+    initialize: function () {
+        this.templateColumn = $("#templateColumn").html();
+        this.columns = $("#columns");
 
-    document.addEventListener( 'deviceready', onDeviceReady.bind( this ), false );
+        this.addColumn("Uzunluk", "<option>10</option>", true, false, 123, 243, 513.712);
+        this.addColumn("Genişlik", "<option>500</option>", true, false, 431, 563, 54.162);
+        this.addColumn("Kalınlık", "<option>410</option>", true, true, 33, 543, 34.142);
+        this.addColumn("Zaman", "<option>120</option>", false, true, 5, 6, 12.132);
+    },
 
-    function onDeviceReady() {
-        // Handle the Cordova pause and resume events
-        document.addEventListener( 'pause', onPause.bind( this ), false );
-        document.addEventListener( 'resume', onResume.bind( this ), false );
-        
-        // TODO: Cordova has been loaded. Perform any initialization that requires Cordova here.
-        var parentElement = document.getElementById('deviceready');
-        var listeningElement = parentElement.querySelector('.listening');
-        var receivedElement = parentElement.querySelector('.received');
-        listeningElement.setAttribute('style', 'display:none;');
-        receivedElement.setAttribute('style', 'display:block;');
-    };
+    addColumn: function (columnName, filterOptions, showFilter, showDetails, min, max, avg) {
+        var temp = this.templateColumn;
+        temp = temp.replace("#columnName#", columnName);
+        temp = temp.replace("#filterOptions#", filterOptions);
 
-    function onPause() {
-        // TODO: This application has been suspended. Save application state here.
-    };
+        if (showFilter)
+            temp = temp.replace("#filterVisible#", "");
+        else
+            temp = temp.replace("#filterVisible#", "hidden");
 
-    function onResume() {
-        // TODO: This application has been reactivated. Restore application state here.
-    };
-} )();
+        if (showDetails)
+            temp = temp.replace("#visible#", "");
+        else
+            temp = temp.replace("#visible#", "hidden");
+
+        temp = temp.replace("#min#", min);
+        temp = temp.replace("#max#", max);
+        temp = temp.replace("#avg#", avg);
+        this.columns.append(temp);
+    }
+};
+
+function Column() {
+
+    columnName = null;
+        filterOptions= null,
+            showFilter= true,
+                showDetails= true,
+                    min= 0,
+                        max= 0,
+                            avg= 0
+}
